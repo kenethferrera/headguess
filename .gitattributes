@@ -1,0 +1,23 @@
+# Auto-detect text files and normalize line endings to LF in repo
+* text=auto eol=lf
+
+# Keep Windows line endings in working directory for certain files
+*.bat eol=crlf
+*.cmd eol=crlf
+*.ps1 eol=crlf
+
+# Treat these as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.jar binary
+*.keystore binary
+*.jks binary
+*.so binary
+*.aab binary
+*.apk binary
+*.dex binary
+*.class binary

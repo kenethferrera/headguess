@@ -1,0 +1,51 @@
+# Android / Gradle
+**/build/
+.gradle/
+**/.gradle/
+**/.cxx/
+**/.externalNativeBuild/
+
+# Local configuration
+local.properties
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Keystores (keep these safe and out of VCS)
+**/*.jks
+**/*.keystore
+**/keystore.properties
+
+# Android build outputs
+*.apk
+*.ap_
+*.aab
+
+# Java/Kotlin
+*.class
+
+# NDK
+obj/
+*.hprof
+
+# Captures
+captures/
+
+# Generated
+app/build/
+
+# Gradle caches
+**/build-cache/
+
+# Misc
+/out/

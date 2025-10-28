@@ -1,0 +1,123 @@
+{
+  "Personality": [
+    { "A": "Taylor Swift", "B": "Ariana Grande" },
+    { "A": "Elon Musk", "B": "Jeff Bezos" },
+    { "A": "Cristiano Ronaldo", "B": "Lionel Messi" },
+    { "A": "Tom Holland", "B": "Timothée Chalamet" },
+    { "A": "Billie Eilish", "B": "Olivia Rodrigo" },
+    { "A": "Beyoncé", "B": "Rihanna" },
+    { "A": "Robert Downey Jr.", "B": "Chris Evans" },
+    { "A": "Dwayne Johnson", "B": "Jason Momoa" },
+    { "A": "Selena Gomez", "B": "Miley Cyrus" },
+    { "A": "Ed Sheeran", "B": "Shawn Mendes" },
+    { "A": "Angelina Jolie", "B": "Scarlett Johansson" },
+    { "A": "Justin Bieber", "B": "Zayn Malik" },
+    { "A": "Emma Watson", "B": "Millie Bobby Brown" },
+    { "A": "Michael Jackson", "B": "Prince" },
+    { "A": "LeBron James", "B": "Stephen Curry" },
+    { "A": "Harry Styles", "B": "Louis Tomlinson" },
+    { "A": "Johnny Depp", "B": "Brad Pitt" },
+    { "A": "Oprah Winfrey", "B": "Ellen DeGeneres" },
+    { "A": "Adele", "B": "Sia" },
+    { "A": "Morgan Freeman", "B": "Samuel L. Jackson" }
+  ],
+  "Places": [
+    { "A": "School", "B": "University" },
+    { "A": "Mall", "B": "Market" },
+    { "A": "Park", "B": "Playground" },
+    { "A": "Beach", "B": "Resort" },
+    { "A": "Hospital", "B": "Clinic" },
+    { "A": "Restaurant", "B": "Cafeteria" },
+    { "A": "Library", "B": "Bookstore" },
+    { "A": "Airport", "B": "Train Station" },
+    { "A": "Cinema", "B": "Theater" },
+    { "A": "Office", "B": "Call Center" },
+    { "A": "Gym", "B": "Sports Center" },
+    { "A": "Zoo", "B": "Farm" },
+    { "A": "Bakery", "B": "Coffee Shop" },
+    { "A": "Museum", "B": "Art Gallery" },
+    { "A": "Cemetery", "B": "Memorial Park" },
+    { "A": "Hotel", "B": "Motel" },
+    { "A": "Supermarket", "B": "Convenience Store" },
+    { "A": "Bridge", "B": "Tunnel" },
+    { "A": "Stadium", "B": "Arena" },
+    { "A": "Port", "B": "Harbor" }
+  ],
+  "Animals": [
+    { "A": "Dog", "B": "Cat" },
+    { "A": "Elephant", "B": "Hippopotamus" },
+    { "A": "Lion", "B": "Tiger" },
+    { "A": "Shark", "B": "Dolphin" },
+    { "A": "Horse", "B": "Donkey" },
+    { "A": "Frog", "B": "Toad" },
+    { "A": "Eagle", "B": "Hawk" },
+    { "A": "Snake", "B": "Lizard" },
+    { "A": "Monkey", "B": "Chimpanzee" },
+    { "A": "Wolf", "B": "Fox" },
+    { "A": "Penguin", "B": "Seal" },
+    { "A": "Goat", "B": "Sheep" },
+    { "A": "Crocodile", "B": "Alligator" },
+    { "A": "Rabbit", "B": "Hamster" },
+    { "A": "Butterfly", "B": "Bee" },
+    { "A": "Ant", "B": "Termite" },
+    { "A": "Cow", "B": "Buffalo" },
+    { "A": "Deer", "B": "Moose" },
+    { "A": "Whale", "B": "Orca" },
+    { "A": "Octopus", "B": "Squid" }
+  ],
+  "Objects": [
+    { "A": "Phone", "B": "Tablet" },
+    { "A": "Laptop", "B": "Computer" },
+    { "A": "Pen", "B": "Pencil" },
+    { "A": "Notebook", "B": "Journal" },
+    { "A": "Ruler", "B": "Protractor" },
+    { "A": "Chair", "B": "Stool" },
+    { "A": "Table", "B": "Desk" },
+    { "A": "Scissors", "B": "Cutter" },
+    { "A": "Lamp", "B": "Flashlight" },
+    { "A": "TV", "B": "Monitor" },
+    { "A": "Mouse", "B": "Keyboard" },
+    { "A": "Printer", "B": "Photocopier" },
+    { "A": "Car", "B": "Motorcycle" },
+    { "A": "Airplane", "B": "Helicopter" },
+    { "A": "Camera", "B": "Projector" },
+    { "A": "Clock", "B": "Watch" },
+    { "A": "Umbrella", "B": "Raincoat" },
+    { "A": "Backpack", "B": "Suitcase" },
+    { "A": "Headphones", "B": "Speaker" },
+    { "A": "Spoon", "B": "Fork" }
+  ],
+  "Food": [
+    { "A": "Pizza", "B": "Burger" },
+    { "A": "Pasta", "B": "Noodles" },
+    { "A": "Cake", "B": "Cupcake" },
+    { "A": "Ice Cream", "B": "Gelato" },
+    { "A": "Sushi", "B": "Sashimi" },
+    { "A": "Sandwich", "B": "Hotdog" },
+    { "A": "Rice", "B": "Fried Rice" },
+    { "A": "Fries", "B": "Potato Chips" },
+    { "A": "Steak", "B": "Barbecue" },
+    { "A": "Chocolate", "B": "Candy" },
+    { "A": "Coffee", "B": "Tea" },
+    { "A": "Orange Juice", "B": "Apple Juice" },
+    { "A": "Donut", "B": "Croissant" },
+    { "A": "Soup", "B": "Stew" },
+    { "A": "Taco", "B": "Burrito" },
+    { "A": "Salad", "B": "Coleslaw" },
+    { "A": "Fried Chicken", "B": "Grilled Chicken" },
+    { "A": "Cereal", "B": "Oatmeal" },
+    { "A": "Pancake", "B": "Waffle" },
+    { "A": "Milkshake", "B": "Smoothie" }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
