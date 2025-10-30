@@ -11,6 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import com.example.headguess.ui.GameViewModel
 import kotlinx.coroutines.delay
 import androidx.activity.compose.BackHandler
@@ -64,14 +68,10 @@ fun ImpostorClientLobbyScreen(navController: NavHostController, vm: GameViewMode
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = {
-                TextButton(onClick = { 
-                    vm.leaveClient()
-                    navController.navigateUp() 
-                }) {
-                    Text("Back")
-                }
-            }
+            navigationIcon = { IconButton(onClick = { 
+                vm.leaveClient()
+                navController.navigateUp() 
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
         
         Spacer(Modifier.height(24.dp))

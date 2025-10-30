@@ -10,6 +10,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import com.example.headguess.ui.GameViewModel
 import com.example.headguess.network.NetworkDiscovery
 import com.example.headguess.network.DiscoveredHost
@@ -92,6 +96,26 @@ fun ImpostorJoinScreen(navController: NavHostController, vm: GameViewModel) {
                 },
                 gameType = "impostor"
             )
+
+            // Also discover custom to enable cross-connection if host publishes as custom
+            NetworkDiscovery.discoverMultipleHosts(
+                onHostFound = { ip, serviceName ->
+                    android.util.Log.d("ImpostorJoinScreen", "Custom host found: $ip ($serviceName)")
+                    val existingHost = discoveredHosts.find { it.ip == ip }
+                    if (existingHost != null) {
+                        discoveredHosts = discoveredHosts.map { 
+                            if (it.ip == ip) it.copy(timestamp = System.currentTimeMillis()) else it 
+                        }
+                    } else {
+                        discoveredHosts = discoveredHosts + DiscoveredHost(ip, serviceName)
+                    }
+                },
+                onHostLost = { ip ->
+                    android.util.Log.d("ImpostorJoinScreen", "Custom host lost via NSD: $ip - removing immediately")
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip }
+                },
+                gameType = "custom"
+            )
         } else {
             showPermissionDialog = true
         }
@@ -117,15 +141,11 @@ fun ImpostorJoinScreen(navController: NavHostController, vm: GameViewModel) {
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = {
-                TextButton(onClick = {
-                    // Stop NSD discovery before leaving (consistent with Guess the Word)
-                    NetworkDiscovery.stopAllDiscoveries()
-                    navController.navigateUp()
-                }) {
-                    Text("Back")
-                }
-            }
+            navigationIcon = { IconButton(onClick = {
+                // Stop NSD discovery before leaving (consistent with Guess the Word)
+                NetworkDiscovery.stopAllDiscoveries()
+                navController.navigateUp()
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
         
         Spacer(Modifier.height(24.dp))

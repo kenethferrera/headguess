@@ -1,0 +1,33 @@
+ICON PROMPTS (Silhouette-Only, Vector-Friendly)
+
+Global style for all 4 icons
+- monochrome silhouette only; no text, no gradients, no outlines; single solid fill
+- minimal, bold shapes; centered; good at 48px; high contrast; negative space used sparingly
+- vector flat icon; exportable as SVG; square canvas with rounded-corner-safe composition
+- background transparent; no drop shadows, no inner details like eyes/mouth
+
+1) Guess the Word (Forehead Mode)
+Prompt:
+Create a monochrome silhouette icon of a person’s head in side profile holding a small rectangular phone on their forehead, with 2–3 small radiating lines indicating the word is hidden from the wearer. Minimal, bold shapes; single solid fill; no facial details; no text. Centered, square composition; vector-friendly, high legibility at small sizes.
+
+2) Charades
+Prompt:
+Create a monochrome silhouette icon of a person in an expressive acting pose (one arm raised, one leg slightly bent) with 2 short motion lines near the hands to imply miming. Minimal, bold shapes; single solid fill; no facial details; no text. Centered, square composition; vector-friendly, high legibility at small sizes.
+
+3) Impostor
+Prompt:
+Create a monochrome silhouette icon showing a small group of three head-and-shoulders figures; make one figure subtly different using a simple shape cue (e.g., a small question mark above them or a distinct cutout halo) to imply “impostor.” Minimal, bold shapes; single solid fill; no facial details; no text. Centered, square composition; vector-friendly, high legibility at small sizes.
+
+4) YES/NO
+Prompt:
+Create a monochrome silhouette icon with a head-and-shoulders figure facing a pair of overlapping cards: one card with a simple check mark cutout and the other with an “X” cutout. Minimal, bold shapes; single solid fill; no facial details; no text. Centered, square composition; vector-friendly, high legibility at small sizes.
+
+Negative prompt (apply to all)
+- no text labels, no letters/words; no gradients; no colors other than solid black; no strokes/outlines; no shadows; no detailed facial features; no complex backgrounds
+
+Batch prompt (all four as a set)
+Design four monochrome silhouette app icons (Guess the Word, Charades, Impostor, Yes/No) using the global style above. Each icon: centered, minimal, single solid fill, vector-friendly, legible at 48px, transparent background, no text or gradients. Concepts: 1) head side-profile with phone on forehead + small radiating lines; 2) actor pose with subtle motion lines; 3) three figures with one subtly marked as impostor (question mark/halo cue); 4) figure with overlapping check and X cards. Keep compositions distinct but visually cohesive as a set.
+
+
+
+

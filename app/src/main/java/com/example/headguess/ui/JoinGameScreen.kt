@@ -5,18 +5,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import com.example.headguess.network.NetworkDiscovery
 import com.example.headguess.network.DiscoveredHost
 import com.example.headguess.utils.PermissionManager
+import androidx.activity.compose.BackHandler
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Arrangement
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Socket
+import com.example.headguess.R
 
 @androidx.compose.material3.ExperimentalMaterial3Api
 @Composable
@@ -25,8 +37,19 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
     var connectionError by remember { mutableStateOf("") }
     var hasPermission by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
+    var discoveryKey by remember { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
+    // Refresh discovery when host disconnects
+    LaunchedEffect(vm.hostDisconnected.value) {
+        if (vm.hostDisconnected.value) {
+            discoveredHosts = emptyList()
+            vm.hostDisconnected.value = false
+            discoveryKey++
+        }
+    }
+
+    LaunchedEffect(discoveryKey) {
         // Check if nearby devices permission is granted
         hasPermission = PermissionManager.isPermissionGranted(navController.context)
         
@@ -48,6 +71,7 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
                     discoveredHosts = discoveredHosts.filter { it.ip != ip } + DiscoveredHost(ip, serviceName)
                 },
                 onHostLost = { ip ->
+                    // Cross connection: remove immediately to avoid delay
                     discoveredHosts = discoveredHosts.filter { it.ip != ip }
                 },
                 gameType = "custom"
@@ -56,11 +80,16 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
             showPermissionDialog = true
         }
     }
+
+    // Removed pruning to avoid dropping valid hosts; rely on NSD onHostLost only
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = { navController.navigateUp() }) { Text("Back") } }
+            navigationIcon = { IconButton(onClick = { 
+                NetworkDiscovery.stopAllDiscoveries()
+                navController.navigateUp() 
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
 
         Spacer(Modifier.height(24.dp))
@@ -74,9 +103,7 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
             }
         } else {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (discoveredHosts.isEmpty()) {
-                    Text("Searching for hosts...")
-                } else {
+                if (discoveredHosts.isNotEmpty()) {
                     Text("Available Hosts (${discoveredHosts.size})")
                     Spacer(Modifier.height(16.dp))
                     
@@ -85,6 +112,7 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
                             onClick = {
                                 connectionError = ""
                                 try {
+                                    NetworkDiscovery.stopAllDiscoveries()
                                     vm.joinHost(host.ip) { navController.navigate("lobby") }
                                 } catch (e: Exception) {
                                     connectionError = "Failed to connect: ${e.message}"
@@ -123,6 +151,11 @@ fun JoinGameScreen(navController: NavHostController, vm: GameViewModel) {
                 }
             )
         }
+    }
+    // System back should also stop discovery
+    BackHandler {
+        NetworkDiscovery.stopAllDiscoveries()
+        navController.navigateUp()
     }
 }
 

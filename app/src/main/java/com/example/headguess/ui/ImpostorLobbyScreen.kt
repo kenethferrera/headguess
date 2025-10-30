@@ -13,6 +13,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.headguess.ui.GameViewModel
@@ -50,15 +54,11 @@ fun ImpostorLobbyScreen(
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = {
-                TextButton(onClick = { 
-                    // Safely stop hosting when leaving lobby
-                    vm.quickStopHosting()
-                    navController.navigateUp() 
-                }) {
-                    Text("Back")
-                }
-            }
+            navigationIcon = { IconButton(onClick = { 
+                // Safely stop hosting when leaving lobby
+                vm.quickStopHosting()
+                navController.navigateUp() 
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
         
         Spacer(Modifier.height(24.dp))

@@ -10,12 +10,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImpostorQuickSetupScreen(navController: NavHostController, vm: GameViewModel) {
     var players by remember { mutableStateOf(3) }
     var category by remember { mutableStateOf(vm.category.value.ifEmpty { "Personality" }) }
+    var impostorCount by remember { mutableStateOf(vm.impostorCount.value.coerceIn(1, players)) }
+    var showRole by remember { mutableStateOf(vm.showImpostorRole.value) }
 
     LaunchedEffect(Unit) { vm.selectCategory(category) }
 
@@ -29,7 +33,7 @@ fun ImpostorQuickSetupScreen(navController: NavHostController, vm: GameViewModel
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = { navController.navigateUp() }) { Text("Back") } }
+            navigationIcon = { IconButton(onClick = { navController.navigateUp() }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -50,16 +54,64 @@ fun ImpostorQuickSetupScreen(navController: NavHostController, vm: GameViewModel
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("How many players?", style = MaterialTheme.typography.titleMedium)
+                Text("Number of Players", style = MaterialTheme.typography.titleMedium)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedButton(onClick = { if (players > 2) players -= 1 }) { Text("-") }
+                    val minPlayers = if (impostorCount >= 2) 5 else 3
+                    OutlinedButton(onClick = {
+                        val newVal = (players - 1).coerceAtLeast(minPlayers)
+                        players = newVal
+                    }) { Text("-") }
                     Text(players.toString(), modifier = Modifier.padding(horizontal = 12.dp), style = MaterialTheme.typography.titleLarge)
-                    OutlinedButton(onClick = { if (players < 10) players += 1 }) { Text("+") }
+                    OutlinedButton(onClick = {
+                        players = (players + 1).coerceAtMost(20)
+                    }) { Text("+") }
                 }
             }
         }
 
         Spacer(Modifier.height(12.dp))
+
+        // Impostor count and Show Role toggle
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Number of Impostors", style = MaterialTheme.typography.titleMedium)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedButton(onClick = {
+                            if (impostorCount > 1) {
+                                impostorCount -= 1
+                                // when dropping below 2, min players becomes 3 (no need to shrink players)
+                            }
+                        }) { Text("-") }
+                        Text(impostorCount.toString(), modifier = Modifier.padding(horizontal = 12.dp), style = MaterialTheme.typography.titleLarge)
+                        OutlinedButton(onClick = {
+                            if (impostorCount < 5) {
+                                impostorCount += 1
+                                // ensure minimum players: if 2+ impostors, min 5
+                                val minPlayersNow = if (impostorCount >= 2) 5 else 3
+                                if (players < minPlayersNow) players = minPlayersNow
+                            }
+                        }) { Text("+") }
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Show impostors their role", style = MaterialTheme.typography.titleMedium)
+                    Switch(checked = showRole, onCheckedChange = { showRole = it })
+                }
+            }
+        }
 
         // Simple category chooser (cycling)
         Card(
@@ -87,15 +139,21 @@ fun ImpostorQuickSetupScreen(navController: NavHostController, vm: GameViewModel
         Spacer(Modifier.weight(1f))
 
         Button(
-            onClick = { navController.navigate("impostorQuickReveal/$players/$category") },
+            onClick = {
+                // persist to VM so reveal screen uses these settings
+                vm.impostorCount.value = impostorCount.coerceIn(1, players)
+                vm.showImpostorRole.value = showRole
+                navController.navigate("impostorQuickReveal/$players/$category")
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            enabled = players >= 2,
+            enabled = players >= (if (impostorCount >= 2) 5 else 3),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) { Text("Start", fontWeight = FontWeight.Bold) }
     }
 }
+
 
 
 

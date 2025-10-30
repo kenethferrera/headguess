@@ -24,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.draw.rotate
+import com.example.headguess.R
 import androidx.core.view.WindowInsetsCompat
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
@@ -65,25 +68,25 @@ val gameList = listOf(
     Game(
         title = "YES or NO Word Guess",
         description = "Ask yes or no questions to guess the word!",
-        iconResId = android.R.drawable.ic_menu_edit, // Using system icon as placeholder
-        route = "yesNoCategory" // Route to YES or NO game
+        iconResId = R.drawable.ic_yesno,
+        route = "yesNoCategory"
     ),
     Game(
         title = "Guess the Word",
         description = "Hold your phone on your head and guess the word from your friends' clues.",
-        iconResId = android.R.drawable.ic_menu_edit, // Using system icon as placeholder
-        route = "create" // Navigate to create/join page first - THE ACTUAL GAME
+        iconResId = R.drawable.ic_guess,
+        route = "create"
     ),
     Game(
         title = "Charades Classic",
         description = "Act it out! Guess without saying the word.",
-        iconResId = android.R.drawable.ic_menu_myplaces, // Using system icon as placeholder
+        iconResId = R.drawable.ic_charades,
         route = "charadesCreate"
     ),
     Game(
-        title = "Impostor",
+        title = "Impostor Game",
         description = "Find the impostor among your friends!",
-        iconResId = android.R.drawable.ic_menu_help, // Using system icon as placeholder
+        iconResId = R.drawable.ic_impostor,
         route = "impostorHome"
     )
 )
@@ -176,116 +179,130 @@ fun HomeScreen(navController: NavHostController) {
             )
         }
     ) {
-        Column(
+        // Root container with background image
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFFAFAFA))
-                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
-            // Custom Header with Hamburger Menu and Country Selection
-            Row(
+            // Background image
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = R.drawable.appbg),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
+            // Main content overlay
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .background(Color(0x80FAFAFA)) // Optional: subtle overlay for contrast
+                    .windowInsetsPadding(WindowInsets.statusBars)
             ) {
-                // Hamburger Menu Button
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                
-                // Country Selection Dropdown
-                Box {
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
-                    ) {
-                        OutlinedTextField(
-                            value = selectedCountry,
-                            onValueChange = { },
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                            },
-                            modifier = Modifier
-                                .menuAnchor()
-                                .width(140.dp),
-                            textStyle = MaterialTheme.typography.bodyMedium,
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                // Custom Header with Hamburger Menu and Country Selection
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Hamburger Menu Button
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
-                        
-                        ExposedDropdownMenu(
+                    }
+                    
+                    // Country Selection Dropdown
+                    Box {
+                        ExposedDropdownMenuBox(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onExpandedChange = { expanded = !expanded }
                         ) {
-                            countryList.forEach { country ->
-                                DropdownMenuItem(
-                                    text = { Text(country) },
-                                    onClick = {
-                                        selectedCountry = country
-                                        CountryManager.setCountry(country)
-                                        expanded = false
-                                    }
-                                )
+                            OutlinedTextField(
+                                value = selectedCountry,
+                                onValueChange = { },
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                                },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .width(140.dp),
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                countryList.forEach { country ->
+                                    DropdownMenuItem(
+                                        text = { Text(country) },
+                                        onClick = {
+                                            selectedCountry = country
+                                            CountryManager.setCountry(country)
+                                            expanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
-        
-        // Game Cards Grid
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(gameList) { game ->
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = fadeIn(animationSpec = tween(600)) + 
-                           slideInVertically(
-                               animationSpec = tween(600),
-                               initialOffsetY = { it / 3 }
-                           )
-                ) {
-                    GameCard(
-                        game = game,
-                        onClick = {
-                            // If Custom country is selected, route to custom input first
-                            if (CountryManager.selectedCountry == "Custom") {
-                                when {
-                                    game.route.startsWith("impostor") -> navController.navigate("customImpostorCreateJoin")
-                                    game.route == "create" -> navController.navigate("customGuessCreate") // Guess the Word
-                                    game.route == "yesNoCategory" -> navController.navigate("customWords/yesno") // YES or NO Word Guess
-                                    else -> navController.navigate("customCharadesCreateJoin") // Charades
+            
+            // Game Cards Grid
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(gameList) { game ->
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(animationSpec = tween(600)) + 
+                               slideInVertically(
+                                   animationSpec = tween(600),
+                                   initialOffsetY = { it / 3 }
+                               )
+                    ) {
+                        GameCard(
+                            game = game,
+                            onClick = {
+                                // If Custom country is selected, route to custom input first
+                                if (CountryManager.selectedCountry == "Custom") {
+                                    when {
+                                        game.route.startsWith("impostor") -> navController.navigate("customImpostorCreateJoin")
+                                        game.route == "create" -> navController.navigate("customGuessCreate") // Guess the Word
+                                        game.route == "yesNoCategory" -> navController.navigate("customWords/yesno") // YES or NO Word Guess
+                                        else -> navController.navigate("customCharadesCreateJoin") // Charades
+                                    }
+                                } else {
+                                    navController.navigate(game.route)
                                 }
-                            } else {
-                                navController.navigate(game.route)
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        }
-        
-        // Username Edit Dialog
-        if (showUsernameDialog) {
-            UsernameEditDialog(
-                currentUsername = currentUsername,
-                onUsernameChanged = { newUsername ->
-                    currentUsername = newUsername
-                    UsernameManager.setUsername(context, newUsername)
-                },
-                onDismiss = { showUsernameDialog = false }
-            )
-        }
+            
+            // Username Edit Dialog
+            if (showUsernameDialog) {
+                UsernameEditDialog(
+                    currentUsername = currentUsername,
+                    onUsernameChanged = { newUsername ->
+                        currentUsername = newUsername
+                        UsernameManager.setUsername(context, newUsername)
+                    },
+                    onDismiss = { showUsernameDialog = false }
+                )
+            }
+            }
         }
     }
 }
@@ -417,71 +434,100 @@ fun GameCard(
     game: Game,
     onClick: () -> Unit
 ) {
-    Card(
+    val playersText = when (game.route) {
+        "yesNoCategory" -> "2 PLAYERS"
+        else -> "3-20 PLAYERS"
+    }
+    val labelOnLeft = game.route == "yesNoCategory" || game.route == "charadesCreate"
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(160.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Game Icon
-            Icon(
-                painter = painterResource(id = game.iconResId),
-                contentDescription = game.title,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Game Title
-            Text(
-                text = game.title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Game Description
-            Text(
-                text = game.description,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 20.sp
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Play Button
-            Button(
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(12.dp)
+        if (labelOnLeft) {
+            // Label on left
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(72.dp)
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Play",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium
+                    text = playersText,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.rotate(270f),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+        }
+
+        // Card content (center area)
+        Card(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Image placeholder
+                Box(
+                    modifier = Modifier
+                        .size(112.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFFF7F7F7))
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = painterResource(id = game.iconResId),
+                        contentDescription = game.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                    )
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                // Game name
+                Text(
+                    text = game.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    maxLines = 2
+                )
+            }
+        }
+
+        if (!labelOnLeft) {
+            Spacer(Modifier.width(8.dp))
+            // Players label on right
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(80.dp)
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = playersText,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.rotate(270f),
+                    textAlign = TextAlign.Center
                 )
             }
         }

@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -39,7 +41,7 @@ fun ImpostorCategoryScreen(navController: NavHostController) {
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = { navController.navigateUp() }) { Text("Back") } }
+            navigationIcon = { IconButton(onClick = { navController.navigateUp() }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
 
         LazyVerticalGrid(

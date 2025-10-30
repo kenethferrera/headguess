@@ -18,6 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import com.example.headguess.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -41,8 +45,10 @@ fun YesNoCategoryScreen(navController: NavHostController) {
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = { navController.navigateUp() }) { Text("Back") } }
+            navigationIcon = { IconButton(onClick = { navController.navigateUp() }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back", modifier = Modifier.size(30.dp)) } }
         )
+
+        val montserrat = FontFamily.SansSerif
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -54,6 +60,7 @@ fun YesNoCategoryScreen(navController: NavHostController) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .aspectRatio(1f)
                         .clickable { selectedCategory = category },
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(
@@ -71,21 +78,35 @@ fun YesNoCategoryScreen(navController: NavHostController) {
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val assetName = when (category) {
+                            "TVShows" -> "TV SHOWS.avif"
+                            else -> "${category.uppercase()}.avif"
+                        }
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data("file:///android_asset/Images/${category.uppercase()}.avif")
+                                .data("file:///android_asset/Images/$assetName")
                                 .build(),
                             contentDescription = category,
-                            modifier = Modifier.size(64.dp)
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .aspectRatio(1f)
                         )
                         
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         
+                        val displayName = when (category) {
+                            "TVShows" -> "TV SHOWS"
+                            else -> category.uppercase()
+                        }
+                        val adjustedStyle = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
                         Text(
-                            text = category,
-                            style = MaterialTheme.typography.titleMedium,
+                            text = displayName,
+                            style = adjustedStyle,
                             fontWeight = FontWeight.Bold,
+                            fontFamily = montserrat,
                             textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            softWrap = false,
                             color = if (selectedCategory == category) 
                                 MaterialTheme.colorScheme.onPrimaryContainer 
                             else MaterialTheme.colorScheme.onSurface

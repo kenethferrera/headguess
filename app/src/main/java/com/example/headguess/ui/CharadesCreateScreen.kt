@@ -10,6 +10,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import com.example.headguess.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,13 +30,23 @@ fun CharadesCreateScreen(navController: NavHostController) {
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
             navigationIcon = {
-                TextButton(onClick = { navController.navigateUp() }) {
-                    Text("Back")
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back")
                 }
             }
         )
         
         Spacer(Modifier.height(24.dp))
+        
+        Button(
+            onClick = { navController.navigate("charadesQuickSetup") },
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800))
+        ) {
+            Text("⚡ Quick Play", fontWeight = FontWeight.Bold)
+        }
         
         Button(
             onClick = { navController.navigate("charadesCategory") },

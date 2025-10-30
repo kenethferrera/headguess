@@ -8,6 +8,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -22,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,12 +55,12 @@ fun HostLobbyScreen(navController: NavHostController, vm: GameViewModel) {
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = {
+            navigationIcon = { IconButton(onClick = {
                 // Use safer hosting stop when leaving lobby
                 android.util.Log.d("HostLobbyScreen", "User pressed back - stopping hosting safely")
                 vm.quickStopHosting()
                 navController.navigateUp()
-            }) { Text("Back") } }
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
 
         // Minimal lobby details only

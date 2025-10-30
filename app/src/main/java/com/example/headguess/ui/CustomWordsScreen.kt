@@ -26,6 +26,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,18 +59,17 @@ fun CustomWordsScreen(
                     Text("Players Joined: $playersCount")
                 }
             },
-            navigationIcon = {
-                TextButton(onClick = { 
-                    if (gameMode != "yesno") {
-                        vm.stopNSDOnly()
-                    }
-                    navController.popBackStack() 
-                }) {
-                    Text("Back")
-                }
-            }
+            navigationIcon = { IconButton(onClick = { 
+                if (gameMode != "yesno") vm.quickStopHosting()
+                navController.popBackStack() 
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
     }) { padding ->
+        // Ensure system back also hides the host and leaves cleanly
+        BackHandler {
+            if (gameMode != "yesno") vm.quickStopHosting()
+            navController.popBackStack()
+        }
         Column(Modifier.padding(padding).padding(16.dp)) {
             // Title input
             OutlinedTextField(
@@ -208,6 +212,13 @@ fun CustomWordsScreen(
         // For charades mode, show word selection popup immediately
         if (gameMode == "charades") {
             showLoadDialog = true
+        }
+    }
+
+    // Safety: if this screen is disposed unexpectedly, stop NSD so IP hides
+    DisposableEffect(Unit) {
+        onDispose {
+            if (gameMode != "yesno") vm.stopNSDOnly()
         }
     }
 }

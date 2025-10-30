@@ -103,7 +103,7 @@ object NetworkDiscovery {
         val pendingRemovalByService = mutableMapOf<String, Runnable>()
         val ipLastSeen = mutableMapOf<String, Long>() // For impostor: track last seen per IP
         val pendingRemovalByIp = mutableMapOf<String, Runnable>()
-        val debounceMillis = if (gameType == "impostor") 5000L else 0L
+        val debounceMillis = if (gameType == "impostor") 0L else 0L
         val resolveRetryCount = if (gameType == "impostor") 2 else 0
         
         val discoveryListener = object : NsdManager.DiscoveryListener {

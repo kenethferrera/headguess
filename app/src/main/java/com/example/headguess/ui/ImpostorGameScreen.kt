@@ -207,7 +207,7 @@ fun ImpostorGameScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Slide up to reveal",
+                                text = "👆 Tap & Drag to Reveal",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.White,

@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.headguess.network.NetworkDiscovery
@@ -16,6 +17,13 @@ import com.example.headguess.ui.GameViewModel
 import com.example.headguess.utils.PermissionManager
 import androidx.activity.compose.BackHandler
 import kotlinx.coroutines.launch
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.Arrangement
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Socket
+import com.example.headguess.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,46 +89,38 @@ fun CustomGuessJoinScreen(navController: NavHostController, vm: GameViewModel) {
                         // Add new host
                         discoveredHosts = discoveredHosts + DiscoveredHost(ip, serviceName)
                     }
+                    // No extra validation on found; rely on NSD and pruning
                 },
                 onHostLost = { ip ->
-                    // Debounce removal to tolerate NSD flaps
-                    android.util.Log.d("CustomGuessJoinScreen", "Host lost via NSD: $ip - debouncing removal by 5s")
-                    val scheduledAt = System.currentTimeMillis()
-                    scope.launch {
-                        kotlinx.coroutines.delay(5000)
-                        val now = System.currentTimeMillis()
-                        val host = discoveredHosts.find { it.ip == ip }
-                        if (host != null) {
-                            // If it has not been seen again since we scheduled, remove it
-                            if (host.timestamp <= scheduledAt) {
-                                android.util.Log.d("CustomGuessJoinScreen", "Removing host after debounce: $ip")
-                                discoveredHosts = discoveredHosts.filter { it.ip != ip }
-                            } else {
-                                android.util.Log.d("CustomGuessJoinScreen", "Host $ip seen again, keeping it")
-                            }
-                        }
-                    }
+                    // Match General behavior: primary game type removes immediately
+                    android.util.Log.d("CustomGuessJoinScreen", "Host lost via NSD (custom): $ip - removing immediately")
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip }
                 },
                 gameType = "custom"
+            )
+
+            // Also discover general Guess the Word to support cross-connection (host in general, client in custom)
+            NetworkDiscovery.discoverMultipleHosts(
+                onHostFound = { ip, serviceName ->
+                    val existingHost = discoveredHosts.find { it.ip == ip }
+                    if (existingHost != null) {
+                        discoveredHosts = discoveredHosts.map { if (it.ip == ip) it.copy(timestamp = System.currentTimeMillis()) else it }
+                    } else {
+                        discoveredHosts = discoveredHosts + DiscoveredHost(ip, serviceName)
+                    }
+                },
+                onHostLost = { ip ->
+                    // Cross connection: remove immediately to avoid delay
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip }
+                },
+                gameType = "guessword"
             )
         } else {
             showPermissionDialog = true
         }
     }
 
-    // Prune hosts that haven't been seen recently to avoid stale IPs lingering
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(2000)
-            val cutoff = System.currentTimeMillis() - 6000
-            val before = discoveredHosts.size
-            discoveredHosts = discoveredHosts.filter { it.timestamp >= cutoff }
-            val after = discoveredHosts.size
-            if (before != after) {
-                android.util.Log.d("CustomGuessJoinScreen", "Pruned stale hosts: $before -> $after")
-            }
-        }
-    }
+    // Removed pruning; rely on NSD onHostLost and debounced removal only
     
     // Stop discovery when leaving this screen (match Guess general)
     DisposableEffect(Unit) {
@@ -136,12 +136,12 @@ fun CustomGuessJoinScreen(navController: NavHostController, vm: GameViewModel) {
             title = { Text("Join Custom Game") },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
             navigationIcon = {
-                TextButton(onClick = { 
+                IconButton(onClick = { 
                     android.util.Log.d("CustomGuessJoinScreen", "User pressed back - stopping all discoveries")
                     NetworkDiscovery.stopAllDiscoveries()
                     navController.popBackStack() 
                 }) {
-                    Text("Back")
+                    Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back")
                 }
             }
         )
@@ -171,19 +171,8 @@ fun CustomGuessJoinScreen(navController: NavHostController, vm: GameViewModel) {
                 }
             } else {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (isRefreshing) {
-                        // Show loading animation when refreshing after host disconnection
-                        CircularProgressIndicator(
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text("Host disconnected. Searching for new hosts...", color = Color.Gray)
-                    } else if (discoveredHosts.isEmpty()) {
-                        // Show loading animation when no hosts are available
-                        CircularProgressIndicator(
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text("Searching for custom game hosts...", color = Color.Gray)
-                    } else {
+                    // No manual Load button; rely on continuous discovery
+                    if (discoveredHosts.isNotEmpty()) {
                         Text(
                             text = "Available Custom Game Hosts (${discoveredHosts.size})",
                             style = MaterialTheme.typography.titleLarge,

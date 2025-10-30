@@ -167,6 +167,12 @@ fun AppNavHost(navController: NavHostController, vm: GameViewModel) {
         
         // Charades game routes
         composable("charadesCreate") { CharadesCreateScreen(navController) }
+        composable("charadesQuickSetup") { CharadesQuickSetupScreen(navController, vm) }
+        composable("charadesQuickGame/{category}/{wordCount}") { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: "Personality"
+            val wordCount = backStackEntry.arguments?.getString("wordCount")?.toIntOrNull() ?: 3
+            CharadesQuickGameScreen(navController, category, wordCount)
+        }
         composable("charadesCategory") { CharadesCategoryScreen(navController) }
         composable("charadesJoin") { CharadesJoinScreen(navController, vm) }
         composable("charadesSettings/{category}") { backStackEntry ->

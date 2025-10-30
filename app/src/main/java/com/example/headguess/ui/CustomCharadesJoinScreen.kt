@@ -13,6 +13,12 @@ import androidx.navigation.NavHostController
 import com.example.headguess.network.NetworkDiscovery
 import com.example.headguess.network.DiscoveredHost
 import com.example.headguess.utils.PermissionManager
+import androidx.activity.compose.BackHandler
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,8 +26,18 @@ fun CustomCharadesJoinScreen(navController: NavHostController, vm: GameViewModel
     var discoveredHosts by remember { mutableStateOf<List<DiscoveredHost>>(emptyList()) }
     var hasPermission by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
+    var discoveryKey by remember { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
     
-    LaunchedEffect(Unit) {
+    LaunchedEffect(vm.hostDisconnected.value) {
+        if (vm.hostDisconnected.value) {
+            discoveredHosts = emptyList()
+            vm.hostDisconnected.value = false
+            discoveryKey++
+        }
+    }
+
+    LaunchedEffect(discoveryKey) {
         // Check if nearby devices permission is granted
         hasPermission = PermissionManager.isPermissionGranted(navController.context)
         
@@ -31,9 +47,21 @@ fun CustomCharadesJoinScreen(navController: NavHostController, vm: GameViewModel
                     discoveredHosts = discoveredHosts.filter { it.ip != ip } + DiscoveredHost(ip, serviceName)
                 },
                 onHostLost = { ip ->
+                    // Immediate removal for custom charades primary discovery
                     discoveredHosts = discoveredHosts.filter { it.ip != ip }
                 },
                 gameType = "charades" // Search for charades hosts
+            )
+            // Also discover custom charades to allow cross-connection from general
+            NetworkDiscovery.discoverMultipleHosts(
+                onHostFound = { ip, serviceName ->
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip } + DiscoveredHost(ip, serviceName)
+                },
+                onHostLost = { ip ->
+                    // Immediate removal for cross-discovered entries as well
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip }
+                },
+                gameType = "custom"
             )
         } else {
             showPermissionDialog = true
@@ -51,7 +79,10 @@ fun CustomCharadesJoinScreen(navController: NavHostController, vm: GameViewModel
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-            navigationIcon = { TextButton(onClick = { navController.navigateUp() }) { Text("Back") } }
+            navigationIcon = { IconButton(onClick = { 
+                NetworkDiscovery.stopAllDiscoveries()
+                navController.navigateUp() 
+            }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
         )
 
         Spacer(Modifier.height(24.dp))
@@ -66,17 +97,15 @@ fun CustomCharadesJoinScreen(navController: NavHostController, vm: GameViewModel
             }
         } else {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                if (discoveredHosts.isEmpty()) {
-                    Text("Searching for custom charades hosts...")
-                    Spacer(Modifier.height(16.dp))
-                    CircularProgressIndicator()
-                } else {
+                // Removed Load; rely on ongoing discovery
+                if (discoveredHosts.isNotEmpty()) {
                     Text("Available Custom Charades Hosts (${discoveredHosts.size})")
                     Spacer(Modifier.height(16.dp))
                     
                     discoveredHosts.forEach { host ->
                         Button(
                             onClick = {
+                                NetworkDiscovery.stopAllDiscoveries()
                                 vm.joinHost(host.ip) { 
                                     navController.navigate("charadesClientLobby")
                                 }
@@ -108,5 +137,9 @@ fun CustomCharadesJoinScreen(navController: NavHostController, vm: GameViewModel
                 }
             )
         }
+    }
+    BackHandler {
+        NetworkDiscovery.stopAllDiscoveries()
+        navController.navigateUp()
     }
 }

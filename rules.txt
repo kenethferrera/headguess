@@ -1,0 +1,66 @@
+GAME RULES
+
+Guess the Word (Forehead Mode)
+1. Players take turns as the guesser. The guesser holds the device to their forehead so only others can see the word.
+2. The guesser can ask for a clue; teammates give brief verbal hints.
+3. Forbidden: saying the word (or parts), spelling, rhyming, or translations. No acting (use Charades for that).
+4. When the guesser says the exact word, it counts as 1 point and the next word is shown.
+5. If stuck, the group may say “Pass” (0 points) and move on.
+6. Play until the timer ends; then rotate to the next guesser and continue.
+7. After all players have taken turns (or after the agreed rounds), highest total points wins.
+
+Charades (Multiplayer)
+1. One or more actors perform the word using only gestures and body language.
+2. Forbidden: speaking, mouthing letters, writing, or props that reveal the word.
+3. Guessers may call out answers anytime; only exact matches score.
+4. Each correct word is 1 point; you may pass to skip (0 points).
+5. Rotate actors each round; play for a timer or set word count.
+6. Team with the highest total points wins.
+
+Impostor (Multiplayer)
+1. Everyone receives the same secret word except the impostor(s).
+2. In order, each player gives one short clue about “their” word.
+3. Clues must be truthful but not so obvious that they expose the word.
+4. After one clue round (or two, if agreed), all players discuss briefly.
+5. Vote simultaneously on who the impostor is (no self‑vote unless agreed).
+6. If the impostor is caught, the group wins; if not, the impostor wins.
+7. Optional: scoring across rounds (caught impostor = group +1; escaped = impostor +1). Highest total wins.
+
+YES/NO (Party Mode)
+1. One player is the guesser; they cannot see the word (phone to forehead).
+2. The guesser may only ask YES/NO questions to discover the word.
+3. Others must answer only YES or NO; no extra clues, acting, or spelling.
+4. Correct answer = 1 point and advance to the next word; “Pass” = 0 points.
+5. Play until the timer ends; rotate the guesser next round.
+6. Highest total points after the agreed number of rounds wins.
+
+Multiplayer Note
+1. In multiplayer modes, each player’s device receives its own word/role during rounds.
+2. Do not reveal your word to others unless the rules specify (e.g., after voting in Impostor).
+
+HOW THE GAME WORKS (Per Mode)
+
+Guess the Word (Forehead Mode)
+1. One player is the guesser; phone on forehead shows a word to others.
+2. Guesser asks for a clue; team gives short verbal hints (no forbidden hints).
+3. Correct guess advances to next word; pass to skip.
+4. Timer ends → next player becomes guesser; scores accumulate by correct words.
+
+Charades
+1. Selected actor(s) receive a word on their device.
+2. Actor performs silently; team shouts guesses.
+3. Correct guess advances; passes allowed; rotate actor each round.
+4. Team score = total correct words across rounds.
+
+Impostor
+1. Everyone gets the same word except the impostor(s), who get none/different.
+2. Players give one short clue each about “their” word.
+3. Discuss briefly, then vote the suspected impostor.
+4. Reveal outcome; score point to group if caught, impostor if not; repeat rounds.
+
+YES/NO
+1. One player is guesser; phone on forehead hides the word from them.
+2. Guesser asks only yes/no questions; others answer only yes/no.
+3. Correct = point and next word; pass = skip; timer ends round; rotate guesser.
+
+

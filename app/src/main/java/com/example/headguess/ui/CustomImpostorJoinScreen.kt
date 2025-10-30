@@ -18,6 +18,9 @@ import com.example.headguess.ui.GameViewModel
 import com.example.headguess.network.NetworkDiscovery
 import com.example.headguess.network.DiscoveredHost
 import com.example.headguess.utils.PermissionManager
+import androidx.activity.compose.BackHandler
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,37 +30,10 @@ fun CustomImpostorJoinScreen(navController: NavHostController, vm: GameViewModel
     var showPermissionDialog by remember { mutableStateOf(false) }
     var discoveryKey by remember { mutableStateOf(0) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val lastSeenByIp = remember { mutableStateMapOf<String, Long>() }
+    val scope = rememberCoroutineScope()
     
-    // Periodic connection test to remove unreachable hosts
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(3000) // Test every 3 seconds
-            if (discoveredHosts.isNotEmpty()) {
-                android.util.Log.d("CustomImpostorJoinScreen", "Testing connection to ${discoveredHosts.size} hosts")
-                
-                // Test each host by attempting a quick connection
-                val reachableHosts = mutableListOf<DiscoveredHost>()
-                
-                discoveredHosts.forEach { host ->
-                    try {
-                        val socket = java.net.Socket()
-                        socket.connect(java.net.InetSocketAddress(host.ip, 8888), 1000) // 1 second timeout
-                        socket.close()
-                        reachableHosts.add(host)
-                        android.util.Log.d("CustomImpostorJoinScreen", "Host ${host.ip} is reachable")
-                    } catch (e: Exception) {
-                        android.util.Log.d("CustomImpostorJoinScreen", "Host ${host.ip} is unreachable - removing")
-                    }
-                }
-                
-                // Update the list with only reachable hosts
-                if (reachableHosts.size != discoveredHosts.size) {
-                    discoveredHosts = reachableHosts
-                    android.util.Log.d("CustomImpostorJoinScreen", "Removed unreachable hosts: ${discoveredHosts.size} remaining")
-                }
-            }
-        }
-    }
+    // Removed periodic connection tests; rely solely on NSD events
     
     // Watch for host disconnection and immediately clear hosts + show loading
     LaunchedEffect(vm.hostDisconnected.value) {
@@ -99,12 +75,13 @@ fun CustomImpostorJoinScreen(navController: NavHostController, vm: GameViewModel
         hasPermission = PermissionManager.isPermissionGranted(navController.context)
         
         if (hasPermission) {
-            android.util.Log.d("CustomImpostorJoinScreen", "Starting fresh NSD discovery for impostor")
+            android.util.Log.d("CustomImpostorJoinScreen", "Starting fresh NSD discovery for impostor + custom (cross)")
             
             NetworkDiscovery.discoverMultipleHosts(
                 onHostFound = { ip, serviceName ->
                     android.util.Log.d("CustomImpostorJoinScreen", "Host found: $ip ($serviceName)")
                     // Update timestamp for existing host or add new host
+                    lastSeenByIp[ip] = System.currentTimeMillis()
                     val existingHost = discoveredHosts.find { it.ip == ip }
                     if (existingHost != null) {
                         // Update timestamp for existing host
@@ -117,22 +94,48 @@ fun CustomImpostorJoinScreen(navController: NavHostController, vm: GameViewModel
                     }
                 },
                 onHostLost = { ip ->
-                    android.util.Log.d("CustomImpostorJoinScreen", "Host lost via NSD: $ip - immediately removing")
+                    // Immediate removal to avoid delayed disappearance
+                    android.util.Log.d("CustomImpostorJoinScreen", "Host lost via NSD: $ip - removing immediately")
                     discoveredHosts = discoveredHosts.filter { it.ip != ip }
+                    lastSeenByIp.remove(ip)
                 },
                 gameType = "impostor"
+            )
+
+            // Cross-discover custom impostor if published that way
+            NetworkDiscovery.discoverMultipleHosts(
+                onHostFound = { ip, serviceName ->
+                    val existingHost = discoveredHosts.find { it.ip == ip }
+                    if (existingHost != null) {
+                        discoveredHosts = discoveredHosts.map { 
+                            if (it.ip == ip) it.copy(timestamp = System.currentTimeMillis()) else it 
+                        }
+                    } else {
+                        discoveredHosts = discoveredHosts + DiscoveredHost(ip, serviceName)
+                    }
+                },
+                onHostLost = { ip ->
+                    // Immediate removal for cross-discovered entries as well
+                    discoveredHosts = discoveredHosts.filter { it.ip != ip }
+                },
+                gameType = "custom"
             )
         } else {
             showPermissionDialog = true
         }
     }
     
-    // CRITICAL: Stop all discoveries when leaving this screen
     DisposableEffect(Unit) {
         android.util.Log.d("CustomImpostorJoinScreen", "Screen entered")
         onDispose {
-            android.util.Log.d("CustomImpostorJoinScreen", "Screen leaving")
+            android.util.Log.d("CustomImpostorJoinScreen", "Screen leaving - stopping all discoveries")
+            NetworkDiscovery.stopAllDiscoveries()
         }
+    }
+    // Also handle system back to stop discovery consistently
+    BackHandler {
+        NetworkDiscovery.stopAllDiscoveries()
+        navController.popBackStack()
     }
     
     Scaffold(
@@ -141,6 +144,7 @@ fun CustomImpostorJoinScreen(navController: NavHostController, vm: GameViewModel
                 title = { Text("Join Custom Impostor") },
                 navigationIcon = {
                     TextButton(onClick = { 
+                        NetworkDiscovery.stopAllDiscoveries()
                         navController.popBackStack() 
                     }) {
                         Text("← Back")
@@ -284,8 +288,8 @@ fun CustomImpostorJoinScreen(navController: NavHostController, vm: GameViewModel
                                 Button(
                                     onClick = { 
                                         try {
-                                            // CRITICAL: Stop all discoveries immediately when joining!
-                                            android.util.Log.d("CustomImpostorJoinScreen", "User clicked to join")
+                                            // Stop discovery immediately when joining
+                                            NetworkDiscovery.stopAllDiscoveries()
                                             
                                             // Ensure any hosting is stopped before joining
                                             if (vm.role.value == Role.HOST) {

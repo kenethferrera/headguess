@@ -7,6 +7,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.example.headguess.R
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -15,11 +19,7 @@ fun CustomGuessCreateScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = { Text("Custom Guess the Word") },
-                navigationIcon = {
-                    TextButton(onClick = { navController.popBackStack() }) {
-                        Text("Back")
-                    }
-                }
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back") } }
             )
         }
     ) { padding ->

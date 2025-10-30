@@ -39,6 +39,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.size
+import com.example.headguess.R
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -65,12 +70,12 @@ fun CategorySelectionScreen(navController: NavHostController, vm: GameViewModel)
         TopAppBar(
             title = {},
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFAFAFA)),
-        navigationIcon = { TextButton(onClick = { 
+        navigationIcon = { IconButton(onClick = { 
             // Use safer hosting stop when going back
             android.util.Log.d("CategorySelectionScreen", "User pressed back - stopping hosting safely")
             vm.quickStopHosting()
             navController.navigate("create") 
-        }) { Text("Back") } }
+        }) { Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back", modifier = Modifier.size(27.dp)) } }
         )
 
         val gridState = rememberLazyGridState()
@@ -89,6 +94,7 @@ fun CategorySelectionScreen(navController: NavHostController, vm: GameViewModel)
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .aspectRatio(1f)
                         .clickable {
                             selectedCategory = cat
                         },
@@ -106,13 +112,14 @@ fun CategorySelectionScreen(navController: NavHostController, vm: GameViewModel)
                             contentDescription = cat,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .fillMaxWidth(0.6f)
+                                .fillMaxWidth(0.8f)
                                 .aspectRatio(1f)
                         )
                         androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
+                        val displayName = when (cat) { "TVShows" -> "TV SHOWS" else -> cat.uppercase() }
                         Text(
-                            text = cat,
-                            style = MaterialTheme.typography.titleMedium,
+                            text = displayName,
+                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             color = if (selectedCategory == cat) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface

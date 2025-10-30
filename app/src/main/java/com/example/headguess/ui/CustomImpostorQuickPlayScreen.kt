@@ -67,8 +67,8 @@ fun CustomImpostorQuickPlayScreen(navController: NavHostController, vm: GameView
     
     // Note: Game navigation is handled by the Play button in the saved titles dialog
     
-    // Calculate minimum players based on impostor count: N impostors × 2 + 1
-    val minPlayersForImpostors = selectedImpostorCount * 2 + 1
+    // Minimum players rule: 3 for 1 impostor, 5 for 2-5 impostors
+    val minPlayersForImpostors = if (selectedImpostorCount >= 2) 5 else 3
     
     // Auto-adjust player count if it's below minimum
     LaunchedEffect(selectedImpostorCount) {
@@ -330,6 +330,10 @@ fun CustomImpostorQuickPlayScreen(navController: NavHostController, vm: GameView
                                 val maxImpostors = minOf(5, selectedPlayerCount - 1)
                                 if (selectedImpostorCount < maxImpostors) {
                                     selectedImpostorCount++
+                                    // ensure min players if we crossed to >=2 impostors
+                                    if (selectedImpostorCount >= 2 && selectedPlayerCount < 5) {
+                                        selectedPlayerCount = 5
+                                    }
                                 }
                             },
                             enabled = selectedImpostorCount < minOf(5, selectedPlayerCount - 1),
